@@ -39,7 +39,11 @@ io.on("connect", socket => {
 	socket.on("sendMessage", (message, name, callback) => {
 		const user = getUser(socket.id);
 
-		io.to(user.room).emit("message", { text: message, name });
+		io.to(user.room).emit("message", {
+			text: message,
+			name,
+			timestamp: new Date().toISOString(),
+		});
 
 		io.to(user.room).emit("roomData", {
 			room: user.room,
@@ -54,7 +58,7 @@ io.on("connect", socket => {
 
 		if (user) {
 			io.to(user.room).emit("message", {
-				user: "admin",
+				name: "admin",
 				text: `${user.name} has left.`,
 			});
 		}

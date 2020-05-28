@@ -57,6 +57,11 @@ io.on("connect", socket => {
 		const user = removeUser(socket.id);
 
 		if (user) {
+			io.to(user.room).emit("roomData", {
+				room: user.room,
+				users: getUsersInRoom(user.room),
+			});
+
 			io.to(user.room).emit("message", {
 				name: "admin",
 				text: `${user.name} has left.`,

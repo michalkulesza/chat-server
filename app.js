@@ -57,7 +57,9 @@ io.on("connect", socket => {
 
 	socket.on("sendMessage", (message, name, callback) => {
 		const user = getUser(socket.id);
-		const timeStamp = new Date().toISOString();
+		const date = new Date();
+		date.setSeconds(0, 0);
+		const timeStamp = date.toISOString();
 
 		io.to(user.room).emit("message", {
 			text: message,

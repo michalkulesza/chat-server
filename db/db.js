@@ -1,15 +1,16 @@
 const mongoose = require("mongoose");
+require("dotenv").config();
+
+console.log(process.env.MONGODB_URL);
 
 mongoose
-	.connect(
-		"mongodb+srv://xxcuzzme:gpjiwgH6VDBdKqXD@cluster0-awfpb.mongodb.net/chat?retryWrites=true&w=majority",
-		{
-			useNewUrlParser: true,
-			useCreateIndex: true,
-			useUnifiedTopology: true,
-		}
-	)
+	.connect(process.env.MONGODB_URL, {
+		useNewUrlParser: true,
+		useCreateIndex: true,
+		useUnifiedTopology: true,
+	})
 	.then(console.log("✅ MongoDB Connected"))
 	.catch(err => {
 		console.log("❌ MongoDB Error");
+		console.error(err);
 	});

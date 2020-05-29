@@ -24,9 +24,7 @@ messageSchema.methods.addMessage = async (room, message) => {
 		);
 	};
 
-	updatePost()
-		.then(() => console.log("Updated!"))
-		.catch(err => console.error(err));
+	updatePost().catch(err => console.error(err));
 };
 
 messageSchema.methods.getMessages = async () => {

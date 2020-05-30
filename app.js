@@ -4,21 +4,28 @@ const http = require("http");
 const router = require("./router");
 const { MessageModel } = require("./models/Models");
 require("./db/db");
-
-const { addUser, removeUser, getUser, getUsersInRoom } = require("./users");
-
 require("dotenv").config();
-const PORT = process.env.PORT || 5001;
 
+const {
+	addUser,
+	removeUser,
+	getUser,
+	getUsersIdByName,
+	getUsersInRoom,
+} = require("./users");
+
+const PORT = process.env.PORT || 5001;
 const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
 
 io.on("connect", socket => {
-	socket.on("join", ({ name, room }, callback) => {
-		const { error, user } = addUser({ id: socket.id, name, room });
+	//ALL GOOD
+	socket.on("initJoin", ({ name, initRoom }, callback) => {
+		const { error, user } = addUser({ id: socket.id, name, room: initRoom });
 
 		if (error) return callback(error);
+
 		socket.join(user.room);
 
 		io.to(user.room).emit("roomData", {
@@ -39,6 +46,10 @@ io.on("connect", socket => {
 			text: `${name} welcome to the ${room} room.`,
 		});
 	});
+
+	socket.on("joinNewChat", roomName => {});
+
+	socket.on("joinChat", roomName => {});
 
 	socket.on("sendMessage", (message, name, callback) => {
 		const user = getUser(socket.id);

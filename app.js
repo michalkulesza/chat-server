@@ -33,21 +33,6 @@ io.on("connect", socket => {
 		callback();
 	});
 
-	socket.on("joinUser", ({ name, partnersName }, callback) => {
-		const sharedRoom = `${name}${partnersName}`;
-
-		socket.join(sharedRoom);
-
-		socket.broadcast.to(sharedRoom).emit("message", {
-			name: "admin",
-			text: `${name} has joined chat with ${partnersName}`,
-		});
-
-		console.log(`${name} has joined chat with ${partnersName}`);
-
-		callback();
-	});
-
 	socket.on("ready", ({ name, room }) => {
 		socket.emit("message", {
 			name: "admin",

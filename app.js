@@ -26,41 +26,45 @@ io.on("connect", socket => {
 
 		if (error) return callback(error);
 
-		socket.join(user.room);
+		socket.join(initRoom);
 
-		io.to(user.room).emit("roomData", {
-			room: user.room,
-			users: getUsersInRoom(user.room),
+		io.to(initRoom).emit("roomData", {
+			room: initRoom,
+			users: getUsersInRoom(initRoom),
 		});
 
+		socket.emit("initData", "Main");
+
 		socket.broadcast
-			.to(user.room)
+			.to(initRoom)
 			.emit("message", { name: "admin", text: `${user.name} has joined` });
 
 		callback();
 	});
 
 	socket.on("ready", ({ name, room }) => {
-		socket.emit("message", {
-			name: "admin",
-			text: `${name} welcome to the ${room} room.`,
-		});
+		socket.emit("getData", "Main");
 	});
 
-	socket.on("joinNewChat", roomName => {});
+	socket.on("joinChat", ({ roomName }) => {
+		socket.join(roomName);
+		socket.emit("getData", roomName);
+	});
 
-	socket.on("joinChat", roomName => {});
+	socket.on("leaveChat", () => {
+		socket.leaveAll();
+	});
 
-	socket.on("sendMessage", (message, name, callback) => {
-		const user = getUser(socket.id);
+	socket.on("sendMessage", async (message, name, room, callback) => {
 		const date = new Date();
 		date.setSeconds(0, 0);
 		const timeStamp = date.toISOString();
 
-		io.to(user.room).emit("message", {
+		io.sockets.in(room).emit("message", {
 			text: message,
 			name,
 			timestamp: timeStamp,
+			room,
 		});
 
 		const aMessage = new MessageModel({
@@ -69,7 +73,7 @@ io.on("connect", socket => {
 			timestamp: timeStamp,
 		});
 
-		aMessage.addMessage(user.room, aMessage);
+		aMessage.addMessage(room, aMessage);
 		callback();
 	});
 

@@ -6,14 +6,29 @@ router.get("/", (req, res) => {
 	res.send("Server is up and running");
 });
 
-router.get("/api/getmessages", async (req, res) => {
-	const data = await ChatModel.findOne({ title: "Main" }, (err, res) => {
-		if (err) {
-			console.error(err);
+router.post("/api/getmessages", async (req, res) => {
+	const roomName = req.body.roomName;
+	const getData = async () => {
+		return await ChatModel.findOne({ title: roomName });
+	};
+
+	getData().then(data => {
+		if (data) {
+			res.send(data);
 		} else {
-			return res;
+			const updatePost = async () => {
+				const newChat = new ChatModel({
+					title: roomName,
+					messages: [],
+				});
+
+				return await newChat.save();
+			};
+
+			updatePost()
+				.then(data => res.send(data).status(200))
+				.catch(err => console.error(err));
 		}
 	});
-	res.send(data.messages);
 });
 module.exports = router;

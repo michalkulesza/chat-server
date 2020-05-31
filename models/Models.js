@@ -15,7 +15,7 @@ const chatSchema = new Schema({
 messageSchema.methods.addMessage = async (room, message) => {
 	const updatePost = async () => {
 		await ChatModel.updateOne(
-			{ title: "Main" },
+			{ title: room },
 			{
 				$push: {
 					messages: message,

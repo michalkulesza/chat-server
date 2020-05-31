@@ -30,7 +30,9 @@ const getUser = id => {
 
 const getUsersIdByName = name => {
 	const user = users.find(user => user.name === name);
-	return user.id;
+	if (user) {
+		return user.id;
+	}
 };
 
 const getUsersInRoom = room => {

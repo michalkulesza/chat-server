@@ -20,30 +20,21 @@ const server = http.createServer(app);
 const io = socketio(server);
 
 io.on("connect", socket => {
-	//ALL GOOD
-	socket.on("initJoin", ({ name, initRoom }, callback) => {
+	socket.on("initJoin", ({ name, initRoom }) => {
 		const { error, user } = addUser({ id: socket.id, name, room: initRoom });
-
 		if (error) return callback(error);
 
 		socket.join(initRoom);
-
 		io.to(initRoom).emit("roomData", {
 			room: initRoom,
 			users: getUsersInRoom(initRoom),
 		});
 
 		socket.emit("initData", "Main");
-
-		socket.broadcast
-			.to(initRoom)
-			.emit("message", { name: "admin", text: `${user.name} has joined` });
-
-		callback();
 	});
 
-	socket.on("ready", ({ name, room }) => {
-		socket.emit("getData", "Main");
+	socket.on("readyForInitData", initRoom => {
+		socket.emit("getData", initRoom);
 	});
 
 	socket.on("joinChat", ({ roomName }) => {
@@ -55,7 +46,7 @@ io.on("connect", socket => {
 		socket.leaveAll();
 	});
 
-	socket.on("sendMessage", async (message, name, room, callback) => {
+	socket.on("sendMessage", async (message, name, room) => {
 		const date = new Date();
 		date.setSeconds(0, 0);
 		const timeStamp = date.toISOString();
@@ -74,7 +65,6 @@ io.on("connect", socket => {
 		});
 
 		aMessage.addMessage(room, aMessage);
-		callback();
 	});
 
 	socket.on("disconnect", () => {
@@ -95,21 +85,15 @@ io.on("connect", socket => {
 });
 
 app.use(express.json());
-
 app.use(function (req, res, next) {
-	res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
-	res.setHeader(
-		"Access-Control-Allow-Methods",
-		"GET, POST, OPTIONS, PUT, PATCH, DELETE"
-	);
+	res.setHeader("Access-Control-Allow-Origin", "*");
+	res.setHeader("Access-Control-Allow-Methods", "GET, POST");
 	res.setHeader(
 		"Access-Control-Allow-Headers",
 		"X-Requested-With,content-type,Authorization"
 	);
-	res.setHeader("Access-Control-Allow-Credentials", true);
 	next();
 });
 
 app.use(router);
-
 server.listen(PORT, () => console.log(`Server is running on port ${PORT}`));

@@ -46,6 +46,17 @@ io.on("connect", socket => {
 		socket.leaveAll();
 	});
 
+	socket.on("ready", (name, roomName) => {
+		socket.broadcast.to(roomName).emit("message", {
+			text: `${name} has joined the chat.`,
+			name: "admin",
+		});
+		socket.emit("message", {
+			text: "You have joined.",
+			name: "admin",
+		});
+	});
+
 	socket.on("sendMessage", async (message, name, room) => {
 		const date = new Date();
 		date.setSeconds(0, 0);

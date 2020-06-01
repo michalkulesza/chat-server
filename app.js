@@ -87,9 +87,9 @@ io.on("connect", socket => {
 				users: getUsersInRoom(user.room),
 			});
 
-			io.to(user.room).emit("message", {
-				name: "admin",
+			socket.broadcast.to(user.room).emit("message", {
 				text: `${user.name} has left.`,
+				name: "admin",
 			});
 		}
 	});

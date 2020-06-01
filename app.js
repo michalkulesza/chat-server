@@ -48,7 +48,7 @@ io.on("connect", socket => {
 
 	socket.on("ready", (name, roomName) => {
 		socket.broadcast.to(roomName).emit("message", {
-			text: `${name} has joined the chat.`,
+			text: `${name} has joined.`,
 			name: "admin",
 		});
 		socket.emit("message", {

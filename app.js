@@ -2,10 +2,12 @@ require("dotenv").config();
 const express = require("express");
 const socketio = require("socket.io");
 const encrypt = require("socket.io-encrypt");
+const bcrypt = require("bcrypt");
 const http = require("http");
 const router = require("./router");
 
 // const { MessageModel } = require("./models/Models");
+const { UserModel } = require("./models/userModel");
 
 require("./db/db");
 
@@ -15,15 +17,69 @@ const PORT = process.env.PORT || 5001;
 const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
-io.use(encrypt("secret"));
+io.use(encrypt(process.env.SOCKET_SECRET));
 
 io.on("connect", socket => {
 	console.log("Socket Connected");
 
-	socket.on("join", ({ username }) => {
-		console.log(`${username} has joined.`);
+	socket.on("join", async ({ username, password }) => {
+		console.log(`${username} is trying to join.`);
 
-		socket.emit("authSuccessfull");
+		const userExists = await UserModel.exists({ username });
+
+		if (userExists) {
+			if (!password) {
+				socket.emit("authUserExists");
+			} else {
+				const user = await UserModel.findOne({ username });
+				const passCorrect = await bcrypt.compare(password, user.password);
+
+				if (passCorrect) {
+					socket.emit("authSuccessfull", { registered: true });
+				} else {
+					socket.emit("authIncorrectPassword");
+				}
+			}
+		} else {
+			socket.emit("authSuccessfull");
+		}
+	});
+
+	socket.on("register", async ({ username, password }) => {
+		console.log(`${username} is trying to register.`);
+
+		const userExists = await UserModel.exists({ username });
+
+		if (userExists) {
+			socket.emit("authUserExists");
+		} else {
+			if (password) {
+				const hashedPassword = await bcrypt.hash(password, 15);
+				console.log(hashedPassword);
+				const user = new UserModel({
+					username,
+					password: hashedPassword,
+				});
+
+				user
+					.save()
+					.then(doc => {
+						if (doc) {
+							socket.emit("authSuccessfull", { registered: true });
+						}
+					})
+					.catch(err => {
+						console.log(err.message);
+						socket.emit("error", {
+							error: "Error when creating a user",
+						});
+					});
+			} else {
+				socket.emit("error", {
+					error: "Error when creating a user",
+				});
+			}
+		}
 	});
 
 	// socket.on("readyForInitData", initRoom => {

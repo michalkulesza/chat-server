@@ -22,6 +22,7 @@
 		"node": "12.x"
 	},
 	"devDependencies": {
+		"bcrypt": "^5.0.0",
 		"nodemon": "^2.0.6"
 	}
 }

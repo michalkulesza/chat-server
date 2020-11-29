@@ -8,10 +8,12 @@ const router = require("./router");
 
 // const { MessageModel } = require("./models/Models");
 const { UserModel } = require("./models/userModel");
+const { on } = require("process");
 
 require("./db/db");
 
 // const { addUser, removeUser, getUser, getUsersIdByName, getUsersInRoom } = require("./users");
+const { addUserToRoom, removeUserFromRoom, getRoomData, getUsersRoom } = require("./users");
 
 const PORT = process.env.PORT || 5001;
 const app = express();
@@ -20,11 +22,9 @@ const io = socketio(server);
 io.use(encrypt(process.env.SOCKET_SECRET));
 
 io.on("connect", socket => {
-	console.log("Socket Connected");
+	console.log(`socket ${socket.id} connected`);
 
 	socket.on("join", async ({ username, password }) => {
-		console.log(`${username} is trying to join.`);
-
 		const userExists = await UserModel.exists({ username });
 
 		if (userExists) {
@@ -41,13 +41,11 @@ io.on("connect", socket => {
 				}
 			}
 		} else {
-			socket.emit("authSuccessfull");
+			socket.emit("authSuccessfull", { registered: false });
 		}
 	});
 
 	socket.on("register", async ({ username, password }) => {
-		console.log(`${username} is trying to register.`);
-
 		const userExists = await UserModel.exists({ username });
 
 		if (userExists) {
@@ -82,6 +80,32 @@ io.on("connect", socket => {
 		}
 	});
 
+	socket.on("joinRoom", ({ room, user }) => {
+		addUserToRoom(socket.id, user, room);
+		const newRoomData = getRoomData(room);
+
+		socket.emit("roomData", newRoomData);
+	});
+
+	socket.on("disconnect", () => {
+		console.log(`socket ${socket.id} disconnected`);
+		const room = getUsersRoom(socket.id);
+		removeUserFromRoom(socket.id);
+
+		// const user = removeUser(socket.id);
+
+		// if (user) {
+		// 	io.to(user.room).emit("roomData", {
+		// 		room: user.room,
+		// 		users: getUsersInRoom(user.room),
+		// 	});
+
+		// 	socket.broadcast.to(user.room).emit("message", {
+		// 		text: `${user.name} has left.`,
+		// 		name: "admin",
+		// 	});
+		// }
+	});
 	// socket.on("readyForInitData", initRoom => {
 	// 	socket.emit("getData", initRoom);
 	// });
@@ -125,22 +149,6 @@ io.on("connect", socket => {
 	// 	});
 
 	// 	aMessage.addMessage(room, aMessage);
-	// });
-
-	// socket.on("disconnect", () => {
-	// 	const user = removeUser(socket.id);
-
-	// 	if (user) {
-	// 		io.to(user.room).emit("roomData", {
-	// 			room: user.room,
-	// 			users: getUsersInRoom(user.room),
-	// 		});
-
-	// 		socket.broadcast.to(user.room).emit("message", {
-	// 			text: `${user.name} has left.`,
-	// 			name: "admin",
-	// 		});
-	// 	}
 	// });
 });
 

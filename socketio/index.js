@@ -1,44 +1,7 @@
 const { addUserToRoom, removeUserFromRoom, getRoomData, getUsersRoom } = require("../users");
-const { UserModel } = require("../models/userModel");
-const bcrypt = require("bcrypt");
 
 const handleSocket = socket => {
 	console.log(`socket ${socket.id} connected`);
-
-	socket.on("register", async ({ username, password }) => {
-		const userExists = await UserModel.exists({ username });
-
-		if (userExists) {
-			socket.emit("authUserExists");
-		} else {
-			if (password) {
-				const hashedPassword = await bcrypt.hash(password, 15);
-				console.log(hashedPassword);
-				const user = new UserModel({
-					username,
-					password: hashedPassword,
-				});
-
-				user
-					.save()
-					.then(doc => {
-						if (doc) {
-							socket.emit("authSuccessfull", { registered: true });
-						}
-					})
-					.catch(err => {
-						console.log(err.message);
-						socket.emit("error", {
-							error: "Error when creating a user",
-						});
-					});
-			} else {
-				socket.emit("error", {
-					error: "Error when creating a user",
-				});
-			}
-		}
-	});
 
 	socket.on("joinRoom", ({ room, user }) => {
 		addUserToRoom(socket.id, user, room);

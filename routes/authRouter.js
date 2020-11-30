@@ -4,18 +4,43 @@ const router = express.Router();
 
 const { UserModel } = require("../models/userModel");
 
-router.post("/register", (req, res) => {
-	const { username, password } = req.query;
-});
-
-router.post("/join", async (req, res) => {
-	const { username, password } = req.query;
-
+router.post("/register", async (_req, res) => {
+	const { username, password } = req.body;
 	const userExists = await UserModel.exists({ username });
 
 	if (userExists) {
-		if (!password) {
-			res.send("User already exists").status(422);
+		res.status(422).send("User already exists");
+	} else {
+		if (password) {
+			const hashedPassword = await bcrypt.hash(password, 15);
+			const user = new UserModel({
+				username,
+				password: hashedPassword,
+			});
+
+			user
+				.save()
+				.then(doc => {
+					if (doc) {
+						res.sendStatus(200);
+					}
+				})
+				.catch(err => {
+					res.status(400).send(err.message);
+				});
+		} else {
+			res.status(400).send("Error when creating a user");
+		}
+	}
+});
+
+router.post("/join", async (req, res) => {
+	const { username, password } = req.body;
+	const userExists = await UserModel.exists({ username });
+
+	if (userExists) {
+		if (password.length < 4) {
+			res.status(422).send("User already exists");
 		} else {
 			const user = await UserModel.findOne({ username });
 			const passwordCorrect = await bcrypt.compare(password, user.password);
@@ -23,7 +48,7 @@ router.post("/join", async (req, res) => {
 			if (passwordCorrect) {
 				res.sendStatus(200);
 			} else {
-				res.send("Incorrect password").status(401);
+				res.status(401).send("Incorrect password");
 			}
 		}
 	} else {

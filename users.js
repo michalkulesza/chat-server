@@ -6,7 +6,6 @@ let rooms = [
 ];
 
 const addUserToRoom = (id, username, roomname) => {
-	const userName = username.trim().toLowerCase();
 	const roomName = roomname.trim().toLowerCase();
 
 	const roomToJoin = rooms.find(room => room.name === roomName);

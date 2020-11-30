@@ -2,7 +2,6 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const socketio = require("socket.io");
-const encrypt = require("socket.io-encrypt");
 const http = require("http");
 
 const handleSocket = require("./socketio");
@@ -26,7 +25,6 @@ app.use("/auth", authRouter);
 const server = http.createServer(app);
 const io = socketio(server);
 
-io.use(encrypt(process.env.SOCKET_SECRET));
 io.on("connect", socket => handleSocket(socket));
 
 server.listen(PORT, () => console.log(`Server is running on port ${PORT}`));

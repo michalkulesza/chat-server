@@ -392,11 +392,6 @@ crypto-random-string@^2.0.0:
   resolved "https://registry.yarnpkg.com/crypto-random-string/-/crypto-random-string-2.0.0.tgz#ef2a7a966ec11083388369baa02ebead229b30d5"
   integrity sha512-v1plID3y9r/lPhviJ1wrXpLeyUIGAZ2SHNYTEapm7/8A9nLPoyvVp3RK/EPFqn5kEznyWgYZNsRtYYIWbuG8KA==
 
-cryptr@^4.0.0:
-  version "4.0.2"
-  resolved "https://registry.yarnpkg.com/cryptr/-/cryptr-4.0.2.tgz#8a93b5ca7667d1a6131e396bab23a134ff1f5dc6"
-  integrity sha512-gLTcYjmLGe0Kk1yyacvjNKvSdkWBNNgG2tDnbRQP7yE559x/RJLo/I3WAmwCXNXf/fzMHCNp9vDv3PCopZDpXw==
-
 debug@2.6.9, debug@^2.2.0:
   version "2.6.9"
   resolved "https://registry.yarnpkg.com/debug/-/debug-2.6.9.tgz#5d128515df134ff327e90a4c93f4e077a536341f"
@@ -1589,13 +1584,6 @@ socket.io-client@2.3.0:
     parseuri "0.0.5"
     socket.io-parser "~3.3.0"
     to-array "0.1.4"
-
-socket.io-encrypt@^0.2.1:
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/socket.io-encrypt/-/socket.io-encrypt-0.2.1.tgz#0db9932f3222a83c8cf73e32fa91edb2c6904eab"
-  integrity sha512-YrHlLOiZE0S/7hgppK8KgIQ8sdkWrnSZpSFqBA5K95WSyaL983MT7r3lzzudjczS/PxZGieiMQS4GhAmatmQDg==
-  dependencies:
-    cryptr "^4.0.0"
 
 socket.io-parser@~3.3.0:
   version "3.3.1"

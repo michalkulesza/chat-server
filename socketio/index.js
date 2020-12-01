@@ -12,7 +12,14 @@ const handleSocket = io => {
 				const newRoomData = getRoomData(room);
 
 				io.to(room).emit("roomUserData", newRoomData);
+				socket.to(room).emit("message", { text: `${user} joined`, name: "admin", timestamp: new Date().toISOString() });
+
 				socket.emit("roomChatData", MSGS);
+				socket.emit("message", {
+					text: `${user} welcome to ${room} room`,
+					name: "admin",
+					timestamp: new Date().toISOString(),
+				});
 			});
 		});
 

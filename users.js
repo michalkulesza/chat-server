@@ -5,6 +5,8 @@ let rooms = [
 	},
 ];
 
+let usersConnected = [];
+
 const addUserToRoom = (id, username, roomname) => {
 	const roomName = roomname.trim().toLowerCase();
 
@@ -13,6 +15,7 @@ const addUserToRoom = (id, username, roomname) => {
 
 	if (roomToJoin) {
 		roomToJoin.users = [...roomToJoin.users, user];
+		usersConnected = [...usersConnected, user];
 	} else {
 		const newRoom = {
 			name: roomName,
@@ -20,11 +23,16 @@ const addUserToRoom = (id, username, roomname) => {
 		};
 
 		rooms = [...rooms, newRoom];
+		usersConnected = [...usersConnected, user];
 	}
 };
 
 const getRoomData = roomName => {
 	return rooms.find(room => room.name === roomName);
+};
+
+const getUser = id => {
+	return usersConnected.find(user => user.id === id);
 };
 
 const getUsersRoom = id => {
@@ -46,6 +54,10 @@ const removeUserFromRoom = id => {
 			},
 		];
 	}
+	usersConnected = usersConnected.splice(
+		usersConnected.findIndex(user => user.id === id),
+		1
+	);
 };
 
 // const getUser = id => {
@@ -68,7 +80,7 @@ module.exports = {
 	addUserToRoom,
 	removeUserFromRoom,
 	getRoomData,
-
+	getUser,
 	getUsersRoom,
 
 	// removeUser,

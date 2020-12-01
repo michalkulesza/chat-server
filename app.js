@@ -25,6 +25,6 @@ app.use("/auth", authRouter);
 const server = http.createServer(app);
 const io = socketio(server);
 
-io.on("connect", socket => handleSocket(socket));
+handleSocket(io);
 
 server.listen(PORT, () => console.log(`Server is running on port ${PORT}`));

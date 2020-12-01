@@ -1,13 +1,20 @@
 const { addUserToRoom, removeUserFromRoom, getRoomData, getUsersRoom } = require("../users");
 
+const MSGS = [{ _id: "123", text: "hELLO World", name: "admin", timestamp: "02301239219" }];
+
 const handleSocket = socket => {
 	console.log(`socket ${socket.id} connected`);
 
 	socket.on("joinRoom", ({ room, user }) => {
 		addUserToRoom(socket.id, user, room);
-		const newRoomData = getRoomData(room);
+		socket.join(room, () => {
+			const newRoomData = getRoomData(room);
 
-		socket.emit("roomData", newRoomData);
+			socket.to(room).emit("roomUserData", newRoomData);
+			socket.to(room).emit("roomUserData", newRoomData);
+
+			socket.emit("roomUserData", newRoomData);
+		});
 	});
 
 	socket.on("disconnect", () => {
